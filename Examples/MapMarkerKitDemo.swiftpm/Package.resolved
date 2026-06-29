@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "mapmarkerkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pilaski/MapMarkerKit.git",
+      "state" : {
+        "branch" : "claude/mapmarkerkit-refactor-pn1r5x",
+        "revision" : "f1ab282e77cacda32c45c5d4ff11d669a6081790"
+      }
+    }
+  ],
+  "version" : 2
+}
