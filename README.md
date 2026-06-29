@@ -89,8 +89,8 @@ MarkerRenderer.drawMarker(at: pointOnCanvas, style: style,
 
 An example Swift Playgrounds app lives at
 [`Examples/MapMarkerKitDemo.swiftpm`](Examples/MapMarkerKitDemo.swiftpm). Open it in
-Swift Playgrounds (iPad/Mac) or Xcode — it depends on this package by relative path,
-so it always builds against the local source. It has three tabs:
+Swift Playgrounds (iPad/Mac) or Xcode — it depends on this package remotely from
+`https://github.com/pilaski/MapMarkerKit.git`. It has three tabs:
 
 - **Catalog** — every predefined marker and label style with a live preview and the
   list of properties each one lets you change.

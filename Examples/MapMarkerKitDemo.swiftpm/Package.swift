@@ -35,7 +35,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(path: "../..")
+        .package(url: "https://github.com/pilaski/MapMarkerKit.git", branch: "claude/mapmarkerkit-refactor-pn1r5x")
     ],
     targets: [
         .executableTarget(
