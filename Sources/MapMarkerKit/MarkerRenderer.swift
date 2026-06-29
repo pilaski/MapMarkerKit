@@ -37,19 +37,17 @@ public enum MarkerRenderer {
             let rect = CGRect(origin: origin, size: geo.size)
             let path = TeardropPinShape().path(in: rect)
             fillAndStroke(path, fill: fill, stroke: stroke, lineWidth: max(1, geo.size.width * 0.04), in: ctx)
-            // The light head disc behind the glyph.
+            // The light head disc, with the glyph (if any) reading in the pin's fill.
             let headD = max(8, geo.size.width * 0.6)
             let headCenter = shift(geo.glyphCenter, by: origin)
-            if style.symbol != .none {
-                let headRect = CGRect(x: headCenter.x - headD / 2, y: headCenter.y - headD / 2,
-                                      width: headD, height: headD)
-                ctx.saveGState()
-                ctx.setFillColor(glyphColor.cgColor)
-                ctx.fillEllipse(in: headRect)
-                ctx.restoreGState()
-                drawGlyph(style.symbol, at: headCenter, pointSize: geo.glyphPointSize,
-                          color: fill, number: number, in: ctx)
-            }
+            let headRect = CGRect(x: headCenter.x - headD / 2, y: headCenter.y - headD / 2,
+                                  width: headD, height: headD)
+            ctx.saveGState()
+            ctx.setFillColor(glyphColor.cgColor)
+            ctx.fillEllipse(in: headRect)
+            ctx.restoreGState()
+            drawGlyph(style.symbol, at: headCenter, pointSize: geo.glyphPointSize,
+                      color: fill, number: number, in: ctx)
         case .balloon:
             let rect = CGRect(origin: origin, size: geo.size)
             let path = BalloonShape().path(in: rect)
