@@ -59,11 +59,11 @@ public struct MarkerStyleTemplate: Identifiable {
 public struct LabelStyleTemplate: Identifiable {
     public let id: String
     public let name: String
-    public let defaultStyle: LabelStyle
+    public let defaultStyle: MarkerLabelStyle
     /// A short description of what makes this label style distinct.
     public let summary: String
 
-    public init(id: String, name: String, summary: String, defaultStyle: LabelStyle) {
+    public init(id: String, name: String, summary: String, defaultStyle: MarkerLabelStyle) {
         self.id = id
         self.name = name
         self.summary = summary
@@ -88,39 +88,39 @@ public enum MarkerCatalog {
             capabilities: [.fillColor, .glyphColor, .symbol, .size, .label],
             defaultStyle: MarkerStyle(shape: .teardrop, symbol: .pin, fillColor: .purple,
                                       glyphColor: .white, size: 28,
-                                      label: LabelStyle(placement: .bottom, distance: 4))),
+                                      label: MarkerLabelStyle(placement: .bottom, distance: 4))),
         MarkerStyleTemplate(
             id: "circle", name: "Circle", shape: .circle,
             capabilities: [.fillColor, .glyphColor, .strokeColor, .symbol, .size, .label],
             defaultStyle: MarkerStyle(shape: .circle, symbol: .airplane, fillColor: .orange,
                                       glyphColor: .white, size: 22,
-                                      label: LabelStyle(placement: .right))),
+                                      label: MarkerLabelStyle(placement: .right))),
         MarkerStyleTemplate(
             id: "dot", name: "Dot", shape: .dot,
             capabilities: [.fillColor, .strokeColor, .size, .label],
             defaultStyle: MarkerStyle(shape: .dot, symbol: .none, fillColor: .red,
                                       glyphColor: .white, size: 12,
-                                      label: LabelStyle(placement: .right))),
+                                      label: MarkerLabelStyle(placement: .right))),
         MarkerStyleTemplate(
             id: "balloon", name: "Balloon", shape: .balloon,
             capabilities: [.fillColor, .glyphColor, .symbol, .label],
             defaultStyle: MarkerStyle(shape: .balloon, symbol: .star, fillColor: .teal,
                                       glyphColor: .white,
-                                      label: LabelStyle(placement: .right, anchor: .secondary)))
+                                      label: MarkerLabelStyle(placement: .right, anchor: .secondary)))
     ]
 
     /// Every predefined label style.
     public static let labelStyles: [LabelStyleTemplate] = [
         LabelStyleTemplate(
             id: "pill", name: "Pill", summary: "Text on a rounded pill background.",
-            defaultStyle: LabelStyle(shape: .pill)),
+            defaultStyle: MarkerLabelStyle(shape: .pill)),
         LabelStyleTemplate(
             id: "rectangular", name: "Rectangular", summary: "Text on a rounded-rectangle background.",
-            defaultStyle: LabelStyle(shape: .rectangular)),
+            defaultStyle: MarkerLabelStyle(shape: .rectangular)),
         LabelStyleTemplate(
             id: "twoSegment", name: "Two-color segments",
             summary: "Two adjacent strings on two background colors.",
-            defaultStyle: LabelStyle(twoSegment: true)),
+            defaultStyle: MarkerLabelStyle(twoSegment: true)),
         LabelStyleTemplate(
             id: "outlined", name: "Outlined caption",
             summary: "White text with a slim outline and no background, like a map caption.",

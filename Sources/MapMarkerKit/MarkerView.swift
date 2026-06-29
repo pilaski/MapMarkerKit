@@ -147,13 +147,13 @@ public struct MarkerView: View {
 #Preview {
     VStack(spacing: 40) {
         MarkerView(style: MarkerStyle(shape: .teardrop, symbol: .pin, fillColor: .purple,
-                                      label: LabelStyle(placement: .bottom)),
+                                      label: MarkerLabelStyle(placement: .bottom)),
                    primaryText: "Berlin")
         MarkerView(style: MarkerStyle(shape: .circle, symbol: .airplane, fillColor: .orange, size: 22,
-                                      label: LabelStyle(placement: .right, twoSegment: true)),
+                                      label: MarkerLabelStyle(placement: .right, twoSegment: true)),
                    primaryText: "HAM", secondaryText: "Hamburg")
         MarkerView(style: MarkerStyle(shape: .teardrop, symbol: .number, fillColor: .blue,
-                                      label: LabelStyle(placement: .top, anchor: .secondary,
+                                      label: MarkerLabelStyle(placement: .top, anchor: .secondary,
                                                         textColor: .white, textStyle: .outlined, shape: .none)),
                    primaryText: "Caption", number: 3)
     }

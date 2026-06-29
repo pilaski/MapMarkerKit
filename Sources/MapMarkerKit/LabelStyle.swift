@@ -88,8 +88,8 @@ public enum LabelTextStyle: String, CaseIterable, Identifiable, Codable, Sendabl
 
 /// The full appearance of a marker label: where it attaches, how its text is drawn
 /// and how its background box looks. Content (the actual strings) is supplied at
-/// render time, so one `LabelStyle` can be reused across many markers.
-public struct LabelStyle: Equatable {
+/// render time, so one `MarkerLabelStyle` can be reused across many markers.
+public struct MarkerLabelStyle: Equatable {
     // Placement
     public var placement: LabelPlacement
     public var anchor: LabelAnchor
@@ -146,7 +146,7 @@ public struct LabelStyle: Equatable {
 
     /// A caption preset: white outlined text with no background box (the look of the
     /// app's existing map captions).
-    public static let caption = LabelStyle(
+    public static let caption = MarkerLabelStyle(
         placement: .bottom, anchor: .base, distance: 3,
         fontSize: 12, fontWeight: .semibold,
         textColor: .white, textStyle: .outlined, outlineColor: .black, outlineWidth: 1,

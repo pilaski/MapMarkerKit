@@ -15,7 +15,7 @@ Extracted from and used by the TravelMap app.
   picking a style and customizing its colors, symbol and label.
 - **User-selectable symbols** (`MarkerSymbol`): a palette of common SF Symbols plus a
   sequence-number option and `.custom("sf.symbol.name")`.
-- **Flexible labels** (`LabelStyle`):
+- **Flexible labels** (`MarkerLabelStyle`):
   - Placement: right / left / top / bottom / center.
   - **Anchor**: attach the label to the marker's **base point** (center of a circle,
     tip of a pin) or to a **secondary point** (the head of a pin, the body center of a
@@ -23,7 +23,7 @@ Extracted from and used by the TravelMap app.
   - Background: pill, rectangular, or none.
   - Two-color **segments** (two adjacent strings on two background colors).
   - **Outlined text** — a fill color surrounded by a slim outline color, e.g. white
-    text with a thin black outline, like a map caption (`LabelStyle.caption`).
+    text with a thin black outline, like a map caption (`MarkerLabelStyle.caption`).
 - **Style catalog** (`MarkerCatalog`): the list of available marker and label styles,
   each with the capabilities it exposes (`MarkerCapabilities`) and a SwiftUI `preview`.
 - **Matching Core Graphics renderer** (`MarkerRenderer`) so static images match the
@@ -48,7 +48,7 @@ import MapKit
 import MapMarkerKit
 
 let style = MarkerStyle(shape: .teardrop, symbol: .pin, fillColor: .purple,
-                        label: LabelStyle(placement: .bottom))
+                        label: MarkerLabelStyle(placement: .bottom))
 
 Annotation("", coordinate: coordinate, anchor: style.shape.isBottomAnchored ? .bottom : .center) {
     MarkerView(style: style, primaryText: "Berlin")

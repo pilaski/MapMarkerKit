@@ -8,7 +8,7 @@ struct CatalogView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Marker styles") {
+                Section {
                     ForEach(MarkerCatalog.markerStyles) { template in
                         HStack(spacing: 16) {
                             template.preview()
@@ -25,6 +25,8 @@ struct CatalogView: View {
                         }
                         .padding(.vertical, 4)
                     }
+                } header: {
+                    Text("Marker styles")
                 } footer: {
                     Text("Shapes are predefined. Pick a style, then customise the properties it advertises.")
                 }

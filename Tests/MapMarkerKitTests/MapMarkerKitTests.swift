@@ -72,7 +72,7 @@ final class MapMarkerKitTests: XCTestCase {
     }
 
     func testCaptionLabelIsOutlinedWithoutBackground() {
-        XCTAssertEqual(LabelStyle.caption.textStyle, .outlined)
-        XCTAssertEqual(LabelStyle.caption.shape, .none)
+        XCTAssertEqual(MarkerLabelStyle.caption.textStyle, .outlined)
+        XCTAssertEqual(MarkerLabelStyle.caption.shape, .none)
     }
 }

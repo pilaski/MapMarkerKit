@@ -19,7 +19,7 @@ public struct MarkerStyle: Equatable {
     public var size: CGFloat
     /// The label appearance, or `nil` for a marker that never shows a label. Whether
     /// a label actually draws also depends on whether text is supplied at render time.
-    public var label: LabelStyle?
+    public var label: MarkerLabelStyle?
 
     public init(shape: MarkerShape,
                 symbol: MarkerSymbol = .none,
@@ -27,7 +27,7 @@ public struct MarkerStyle: Equatable {
                 glyphColor: Color = .white,
                 strokeColor: Color = .white,
                 size: CGFloat = 26,
-                label: LabelStyle? = nil) {
+                label: MarkerLabelStyle? = nil) {
         self.shape = shape
         self.symbol = symbol
         self.fillColor = fillColor

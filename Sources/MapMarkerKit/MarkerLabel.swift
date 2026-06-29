@@ -38,15 +38,15 @@ public struct OutlinedText: View {
     }
 }
 
-/// A standalone marker label honouring a `LabelStyle`: a plain or outlined string,
+/// A standalone marker label honouring a `MarkerLabelStyle`: a plain or outlined string,
 /// optionally split into two coloured segments, with a pill / rectangular / no
 /// background. Content is supplied as `primary` (and optional `secondary`) strings.
 public struct MarkerLabel: View {
-    let style: LabelStyle
+    let style: MarkerLabelStyle
     let primary: String?
     let secondary: String?
 
-    public init(style: LabelStyle, primary: String?, secondary: String? = nil) {
+    public init(style: MarkerLabelStyle, primary: String?, secondary: String? = nil) {
         self.style = style
         self.primary = primary
         self.secondary = secondary

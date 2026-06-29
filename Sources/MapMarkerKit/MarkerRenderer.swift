@@ -70,15 +70,15 @@ public enum MarkerRenderer {
 
     private static let labelPad: CGFloat = 3
 
-    private static func labelParts(style: LabelStyle, primary: String?, secondary: String?) -> [String] {
+    private static func labelParts(style: MarkerLabelStyle, primary: String?, secondary: String?) -> [String] {
         [primary, style.twoSegment ? secondary : nil].compactMap { $0 }.filter { !$0.isEmpty }
     }
 
-    private static func labelFont(_ style: LabelStyle) -> UIFont {
+    private static func labelFont(_ style: MarkerLabelStyle) -> UIFont {
         UIFont.systemFont(ofSize: max(8, style.fontSize), weight: .semibold)
     }
 
-    private static func drawLabel(_ style: LabelStyle, parts: [String],
+    private static func drawLabel(_ style: MarkerLabelStyle, parts: [String],
                                   around refBox: CGRect, in ctx: CGContext) {
         let font = labelFont(style)
         let hasBackground = style.shape != .none
@@ -120,7 +120,7 @@ public enum MarkerRenderer {
     }
 
     private static func drawText(_ text: String, at point: CGPoint, font: UIFont,
-                                 style: LabelStyle, textColor: UIColor, in ctx: CGContext) {
+                                 style: MarkerLabelStyle, textColor: UIColor, in ctx: CGContext) {
         let ns = text as NSString
         switch style.textStyle {
         case .plain:

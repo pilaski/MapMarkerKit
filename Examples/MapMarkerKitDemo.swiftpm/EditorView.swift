@@ -1,7 +1,7 @@
 import SwiftUI
 import MapMarkerKit
 
-/// An interactive editor that builds a `MarkerStyle` and `LabelStyle` from controls
+/// An interactive editor that builds a `MarkerStyle` and `MarkerLabelStyle` from controls
 /// and renders the result live — the quickest way to see what the toolkit can do.
 struct EditorView: View {
     // Marker
@@ -29,8 +29,8 @@ struct EditorView: View {
     @State private var twoSegment = false
     @State private var secondaryColor: Color = .purple
 
-    private var labelStyle: LabelStyle {
-        LabelStyle(placement: placement, anchor: anchor, distance: CGFloat(distance),
+    private var labelStyle: MarkerLabelStyle {
+        MarkerLabelStyle(placement: placement, anchor: anchor, distance: CGFloat(distance),
                    fontSize: CGFloat(fontSize), textColor: textColor, textStyle: textStyle,
                    outlineColor: outlineColor, outlineWidth: CGFloat(outlineWidth),
                    shape: labelShape, backgroundColor: background,
