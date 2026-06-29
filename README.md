@@ -85,6 +85,20 @@ MarkerRenderer.drawMarker(at: pointOnCanvas, style: style,
                           primary: "HAM", secondary: "Hamburg", in: cgContext)
 ```
 
+## Example app
+
+An example Swift Playgrounds app lives at
+[`Examples/MapMarkerKitDemo.swiftpm`](Examples/MapMarkerKitDemo.swiftpm). Open it in
+Swift Playgrounds (iPad/Mac) or Xcode — it depends on this package by relative path,
+so it always builds against the local source. It has three tabs:
+
+- **Catalog** — every predefined marker and label style with a live preview and the
+  list of properties each one lets you change.
+- **Editor** — interactively build a marker + label and see the result update live.
+- **Map** — a real `MapKit` map showing the styles in place, including a pin whose
+  label attaches to its tip (base) and a balloon whose label attaches to its body
+  (secondary anchor).
+
 ## Platforms
 
 iOS 17+. The SwiftUI views are cross-platform; `MarkerRenderer` and color resolution
