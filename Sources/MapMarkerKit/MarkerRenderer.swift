@@ -35,7 +35,7 @@ public enum MarkerRenderer {
                        fill: fill, stroke: stroke, borderRatio: 0.16, in: ctx)
         case .teardrop:
             let rect = CGRect(origin: origin, size: geo.size)
-            let path = TeardropPinShape().path(in: rect)
+            let path = TeardropPinShape(customization: style.customization).path(in: rect)
             fillAndStroke(path, fill: fill, stroke: stroke, lineWidth: max(1, geo.size.width * 0.04), in: ctx)
             // The light head disc, with the glyph (if any) reading in the pin's fill.
             let headD = max(8, geo.size.width * 0.6)
@@ -50,7 +50,7 @@ public enum MarkerRenderer {
                       color: fill, number: number, in: ctx)
         case .balloon:
             let rect = CGRect(origin: origin, size: geo.size)
-            let path = BalloonShape(bodyWidth: geo.size.width).path(in: rect)
+            let path = BalloonShape(bodyWidth: geo.size.width, customization: style.customization).path(in: rect)
             fillAndStroke(path, fill: fill, stroke: stroke, lineWidth: max(1, geo.size.width * 0.058), in: ctx)
             drawGlyph(style.symbol, at: shift(geo.glyphCenter, by: origin),
                       pointSize: geo.glyphPointSize, color: glyphColor, number: number, in: ctx)
@@ -82,7 +82,10 @@ public enum MarkerRenderer {
                                   around refBox: CGRect, in ctx: CGContext) {
         let font = labelFont(style)
         let hasBackground = style.shape != .none
-        let pad = hasBackground ? labelPad : 0
+        // Outlined text bleeds ~outlineWidth past the glyphs, so grow the box to keep
+        // the outline from touching the background edge.
+        let outlinePad: CGFloat = style.textStyle == .outlined ? max(0.5, style.outlineWidth) : 0
+        let pad = hasBackground ? labelPad + outlinePad : 0
 
         var totalWidth: CGFloat = 0
         var height: CGFloat = 0

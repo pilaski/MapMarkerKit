@@ -99,10 +99,11 @@ public struct MarkerView: View {
     private func teardropBody(_ geo: MarkerGeometry) -> some View {
         let w = geo.size.width
         let headDiameter = max(8, w * 0.6)
+        let pin = TeardropPinShape(customization: style.customization)
         return ZStack {
-            TeardropPinShape()
+            pin
                 .fill(fill)
-                .overlay(TeardropPinShape().stroke(style.strokeColor, lineWidth: max(1, w * 0.04)))
+                .overlay(pin.stroke(style.strokeColor, lineWidth: max(1, w * 0.04)))
                 .shadow(color: .black.opacity(0.25), radius: 2, x: 0.5, y: 1.5)
             Circle()
                 .fill(style.glyphColor)
@@ -132,7 +133,7 @@ public struct MarkerView: View {
     }
 
     private func balloonBody(_ geo: MarkerGeometry) -> some View {
-        let shape = BalloonShape(bodyWidth: geo.size.width)
+        let shape = BalloonShape(bodyWidth: geo.size.width, customization: style.customization)
         let stroke = max(1, geo.size.width * 0.058)
         return ZStack {
             shape

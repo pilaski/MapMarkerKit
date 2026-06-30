@@ -4,8 +4,12 @@ import MapMarkerKit
 /// An interactive editor that builds a `MarkerStyle` and `MarkerLabelStyle` from controls
 /// and renders the result live — the quickest way to see what the toolkit can do.
 struct EditorView: View {
+    @EnvironmentObject private var shapeStore: CustomShapeStore
+
     // Marker
     @State private var shape: MarkerShape = .teardrop
+    /// The selected saved custom shape, or `nil` to use the predefined `shape` above.
+    @State private var customShapeID: UUID? = nil
     @State private var symbol: MarkerSymbol = .pin
     @State private var fill: Color = .purple
     @State private var glyph: Color = .white
@@ -37,9 +41,22 @@ struct EditorView: View {
                    twoSegment: twoSegment, secondaryColor: secondaryColor)
     }
 
+    /// The custom shape currently selected in the picker, if any.
+    private var selectedCustom: CustomMarkerShape? {
+        shapeStore.shapes.first { $0.id == customShapeID }
+    }
+
+    /// The shape actually drawn: the selected custom shape's base, or the predefined one.
+    private var effectiveShape: MarkerShape { selectedCustom?.base ?? shape }
+
+    /// The dimension overrides applied, from the selected custom shape (none otherwise).
+    private var customization: ShapeCustomization {
+        selectedCustom?.customization ?? ShapeCustomization()
+    }
+
     private var style: MarkerStyle {
-        MarkerStyle(shape: shape, symbol: symbol, fillColor: fill, glyphColor: glyph,
-                    strokeColor: stroke, size: CGFloat(size),
+        MarkerStyle(shape: effectiveShape, symbol: symbol, fillColor: fill, glyphColor: glyph,
+                    strokeColor: stroke, size: CGFloat(size), customization: customization,
                     label: showLabel ? labelStyle : nil)
     }
 
@@ -63,7 +80,14 @@ struct EditorView: View {
                     Picker("Shape", selection: $shape) {
                         ForEach(MarkerShape.allCases) { Text($0.displayName).tag($0) }
                     }
-                    if shape.showsGlyph {
+                    .disabled(customShapeID != nil)
+                    if !shapeStore.shapes.isEmpty {
+                        Picker("Custom shape", selection: $customShapeID) {
+                            Text("None (predefined)").tag(UUID?.none)
+                            ForEach(shapeStore.shapes) { Text($0.name).tag(Optional($0.id)) }
+                        }
+                    }
+                    if effectiveShape.showsGlyph {
                         Picker("Symbol", selection: $symbol) {
                             ForEach(MarkerSymbol.pickable) { Text($0.displayName).tag($0) }
                         }
@@ -81,7 +105,7 @@ struct EditorView: View {
                         Picker("Placement", selection: $placement) {
                             ForEach(LabelPlacement.allCases) { Text($0.displayName).tag($0) }
                         }
-                        if shape.hasSecondaryAnchor {
+                        if effectiveShape.hasSecondaryAnchor {
                             Picker("Attach to", selection: $anchor) {
                                 ForEach(LabelAnchor.allCases) { Text($0.displayName).tag($0) }
                             }

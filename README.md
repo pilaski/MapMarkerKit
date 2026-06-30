@@ -11,8 +11,12 @@ Extracted from and used by the TravelMap app.
 ## Features
 
 - **Predefined marker shapes** (`MarkerShape`): `teardrop` (a classic map pin),
-  `circle`, `dot`, `balloon`. Shapes aren't user-editable — you build a marker by
-  picking a style and customizing its colors, symbol and label.
+  `circle`, `dot`, `balloon`. You build a marker by picking a style and customizing its
+  colors, symbol and label.
+- **Customizable shape dimensions** (`ShapeCustomization`): the pin and balloon expose
+  adjustable outline parameters (`MarkerShape.customizableParameters` — e.g. a pin's tip
+  length or a balloon's pointer). Save a tuned shape as a named `CustomMarkerShape` in a
+  `CustomShapeStore` and reuse it across markers.
 - **User-selectable symbols** (`MarkerSymbol`): a palette of common SF Symbols plus a
   sequence-number option and `.custom("sf.symbol.name")`.
 - **Flexible labels** (`MarkerLabelStyle`):
@@ -85,16 +89,41 @@ MarkerRenderer.drawMarker(at: pointOnCanvas, style: style,
                           primary: "HAM", secondary: "Hamburg", in: cgContext)
 ```
 
+### Customizing a shape
+
+Adjust a customizable shape's dimensions and save it for reuse:
+
+```swift
+// Which dimensions can be tuned, with their ranges and defaults.
+let params = MarkerShape.balloon.customizableParameters   // [pointer, corner]
+
+// A balloon with a longer pointer and rounder corners.
+var dims = ShapeCustomization()
+dims["pointer"] = 0.5
+dims["corner"]  = 0.45
+
+let store = CustomShapeStore()
+store.add(CustomMarkerShape(name: "Long balloon", base: .balloon, customization: dims))
+
+// Build a marker on top of the saved shape.
+let custom = store.shapes[0]
+let style = custom.apply(to: MarkerStyle(shape: .balloon, symbol: .star, fillColor: .teal))
+MarkerView(style: style, primaryText: "Munich")
+```
+
 ## Example app
 
 An example Swift Playgrounds app lives at
 [`Examples/MapMarkerKitDemo.swiftpm`](Examples/MapMarkerKitDemo.swiftpm). Open it in
 Swift Playgrounds (iPad/Mac) or Xcode — it depends on this package remotely from
-`https://github.com/pilaski/MapMarkerKit.git`. It has three tabs:
+`https://github.com/pilaski/MapMarkerKit.git`. It has four tabs:
 
 - **Catalog** — every predefined marker and label style with a live preview and the
   list of properties each one lets you change.
-- **Editor** — interactively build a marker + label and see the result update live.
+- **Editor** — interactively build a marker + label and see the result update live,
+  including any custom shapes saved in the Shapes tab.
+- **Shapes** — modify a customizable base shape's dimensions and store it as a named
+  custom shape for the Editor to use.
 - **Map** — a real `MapKit` map showing the styles in place, including a pin whose
   label attaches to its tip (base) and a balloon whose label attaches to its body
   (secondary anchor).

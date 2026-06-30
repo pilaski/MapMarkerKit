@@ -1,7 +1,8 @@
 import SwiftUI
+import CoreGraphics
 
 /// Text drawn with a slim surrounding outline (a second colour around the fill), like
-/// a map caption. Implemented by stamping the text in the outline colour at eight
+/// a map caption. Implemented by stamping the text in the outline colour at several
 /// offsets behind the fill copy, which works on every supported OS without private API.
 public struct OutlinedText: View {
     let text: String
@@ -18,14 +19,17 @@ public struct OutlinedText: View {
         self.width = width
     }
 
+    /// Offsets sampled evenly around a circle of radius `width`, so every stamp sits the
+    /// same distance from the glyph (the old 8-point grid put diagonals ~1.4× further
+    /// out, which showed as a star at larger widths). The sample count grows with the
+    /// width so a thick outline stays a smooth ring instead of separating into dots.
     private var offsets: [CGSize] {
         let w = max(0.5, width)
-        return [
-            CGSize(width: -w, height: 0), CGSize(width: w, height: 0),
-            CGSize(width: 0, height: -w), CGSize(width: 0, height: w),
-            CGSize(width: -w, height: -w), CGSize(width: w, height: -w),
-            CGSize(width: -w, height: w), CGSize(width: w, height: w)
-        ]
+        let count = max(8, Int((w * 4).rounded()))
+        return (0..<count).map { i in
+            let angle = (Double(i) / Double(count)) * 2 * .pi
+            return CGSize(width: CGFloat(cos(angle)) * w, height: CGFloat(sin(angle)) * w)
+        }
     }
 
     public var body: some View {
@@ -76,11 +80,17 @@ public struct MarkerLabel: View {
         }
     }
 
+    /// Extra background padding so an outlined glyph (which bleeds ~`outlineWidth`
+    /// past its bounds) isn't clipped or cramped by the pill / rectangle edge.
+    private var outlinePad: CGFloat {
+        style.textStyle == .outlined ? max(0.5, style.outlineWidth) : 0
+    }
+
     @ViewBuilder
     private func segment(_ text: String, background: Color) -> some View {
         textView(text)
-            .padding(.horizontal, style.shape == .none ? 0 : 5)
-            .padding(.vertical, style.shape == .none ? 0 : 1.5)
+            .padding(.horizontal, style.shape == .none ? 0 : 5 + outlinePad)
+            .padding(.vertical, style.shape == .none ? 0 : 1.5 + outlinePad)
             .background(background)
     }
 

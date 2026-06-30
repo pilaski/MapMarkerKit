@@ -81,6 +81,71 @@ final class MapMarkerKitTests: XCTestCase {
         XCTAssertTrue(balloon.capabilities.contains(.size))
     }
 
+    func testCustomizableShapesAdvertiseParameters() {
+        XCTAssertTrue(MarkerShape.teardrop.isCustomizable)
+        XCTAssertTrue(MarkerShape.balloon.isCustomizable)
+        XCTAssertFalse(MarkerShape.circle.isCustomizable)
+        XCTAssertFalse(MarkerShape.dot.isCustomizable)
+        XCTAssertEqual(MarkerShape.balloon.customizableParameters.map(\.id), ["pointer", "corner"])
+    }
+
+    func testCustomizationResolvesDefaultAndClamps() {
+        let shape = MarkerShape.balloon
+        // Unset -> default.
+        XCTAssertEqual(shape.value(of: "pointer", in: ShapeCustomization()),
+                       BalloonShape.pointerRatio, accuracy: 0.0001)
+        // Out-of-range overrides clamp to the parameter's bounds.
+        XCTAssertEqual(shape.value(of: "pointer", in: ShapeCustomization(values: ["pointer": 99])),
+                       0.60, accuracy: 0.0001)
+        XCTAssertEqual(shape.value(of: "pointer", in: ShapeCustomization(values: ["pointer": -5])),
+                       0.15, accuracy: 0.0001)
+    }
+
+    func testBalloonGeometryRespectsPointerCustomization() {
+        let base = MarkerStyle(shape: .balloon, size: 26)
+        let longer = MarkerStyle(shape: .balloon, size: 26,
+                                 customization: ShapeCustomization(values: ["pointer": 0.6]))
+        let baseGeo = MarkerGeometry.make(for: base)
+        let longerGeo = MarkerGeometry.make(for: longer)
+        // A longer pointer makes the full box taller while the body width is unchanged.
+        XCTAssertEqual(baseGeo.size.width, longerGeo.size.width, accuracy: 0.001)
+        XCTAssertGreaterThan(longerGeo.size.height, baseGeo.size.height)
+        XCTAssertEqual(longerGeo.size.height, 26 + 26 * 0.6, accuracy: 0.001)
+    }
+
+    func testTeardropGeometryRespectsAspectCustomization() {
+        let style = MarkerStyle(shape: .teardrop, size: 28,
+                                customization: ShapeCustomization(values: ["aspect": 1.6]))
+        let geo = MarkerGeometry.make(for: style)
+        XCTAssertEqual(geo.size.height, 28 * 1.6, accuracy: 0.001)
+    }
+
+    func testCustomShapeStoreAddReplaceRemove() {
+        let store = CustomShapeStore()
+        let shape = CustomMarkerShape(name: "Tall pin", base: .teardrop,
+                                      customization: ShapeCustomization(values: ["aspect": 1.7]))
+        store.add(shape)
+        XCTAssertEqual(store.shapes.count, 1)
+        // Re-adding the same id replaces rather than appends.
+        var renamed = shape
+        renamed.name = "Taller pin"
+        store.add(renamed)
+        XCTAssertEqual(store.shapes.count, 1)
+        XCTAssertEqual(store.shapes.first?.name, "Taller pin")
+        store.remove(shape)
+        XCTAssertTrue(store.shapes.isEmpty)
+    }
+
+    func testCustomShapeAppliesBaseAndCustomization() {
+        let custom = CustomMarkerShape(name: "Round balloon", base: .balloon,
+                                       customization: ShapeCustomization(values: ["corner": 0.5]))
+        let applied = custom.apply(to: MarkerStyle(shape: .circle, fillColor: .red, size: 30))
+        XCTAssertEqual(applied.shape, .balloon)
+        XCTAssertEqual(applied.customization.values["corner"], 0.5)
+        // Untouched properties carry over.
+        XCTAssertEqual(applied.size, 30)
+    }
+
     func testColorHexRoundTrip() {
         XCTAssertNotNil(Color(rgbaHex: "3478F6FF"))
         XCTAssertNil(Color(rgbaHex: "xyz"))

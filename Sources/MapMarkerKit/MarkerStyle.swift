@@ -17,6 +17,9 @@ public struct MarkerStyle: Equatable {
     /// The base dimension of the marker (diameter for circle/dot, head width for a
     /// pin, body width for a balloon). The pointer and corner radius scale with it.
     public var size: CGFloat
+    /// Overrides for the shape's adjustable dimensions (e.g. a pin's tip length or a
+    /// balloon's pointer). Empty means the shape draws at its natural defaults.
+    public var customization: ShapeCustomization
     /// The label appearance, or `nil` for a marker that never shows a label. Whether
     /// a label actually draws also depends on whether text is supplied at render time.
     public var label: MarkerLabelStyle?
@@ -27,6 +30,7 @@ public struct MarkerStyle: Equatable {
                 glyphColor: Color = .white,
                 strokeColor: Color = .white,
                 size: CGFloat = 26,
+                customization: ShapeCustomization = ShapeCustomization(),
                 label: MarkerLabelStyle? = nil) {
         self.shape = shape
         self.symbol = symbol
@@ -34,6 +38,7 @@ public struct MarkerStyle: Equatable {
         self.glyphColor = glyphColor
         self.strokeColor = strokeColor
         self.size = size
+        self.customization = customization
         self.label = label
     }
 
@@ -82,7 +87,7 @@ public struct MarkerGeometry {
                                   glyphCenter: center, glyphPointSize: 0)
         case .teardrop:
             let w = highlighted ? base * 1.18 : base
-            let h = TeardropPinShape.height(forWidth: w)
+            let h = w * style.shape.value(of: "aspect", in: style.customization)
             let fullBox = CGRect(x: 0, y: 0, width: w, height: h)
             let headBox = CGRect(x: 0, y: 0, width: w, height: w)
             let tip = CGPoint(x: w / 2, y: h)
@@ -92,7 +97,7 @@ public struct MarkerGeometry {
                                   glyphCenter: headCenter, glyphPointSize: w * 0.42)
         case .balloon:
             let body = highlighted ? base * 1.15 : base
-            let pointer = body * BalloonShape.pointerRatio
+            let pointer = body * style.shape.value(of: "pointer", in: style.customization)
             let fullBox = CGRect(x: 0, y: 0, width: body, height: body + pointer)
             let bodyBox = CGRect(x: 0, y: 0, width: body, height: body)
             let tip = CGPoint(x: body / 2, y: body + pointer)
