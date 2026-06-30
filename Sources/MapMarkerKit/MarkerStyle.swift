@@ -15,7 +15,7 @@ public struct MarkerStyle: Equatable {
     /// The border colour around the shape.
     public var strokeColor: Color
     /// The base dimension of the marker (diameter for circle/dot, head width for a
-    /// pin). Balloons use an intrinsic size and ignore this.
+    /// pin, body width for a balloon). The pointer and corner radius scale with it.
     public var size: CGFloat
     /// The label appearance, or `nil` for a marker that never shows a label. Whether
     /// a label actually draws also depends on whether text is supplied at render time.
@@ -91,8 +91,8 @@ public struct MarkerGeometry {
                                   baseBox: fullBox, secondaryBox: headBox,
                                   glyphCenter: headCenter, glyphPointSize: w * 0.42)
         case .balloon:
-            let pointer: CGFloat = 9
-            let body: CGFloat = highlighted ? 30 : 26
+            let body = highlighted ? base * 1.15 : base
+            let pointer = body * BalloonShape.pointerRatio
             let fullBox = CGRect(x: 0, y: 0, width: body, height: body + pointer)
             let bodyBox = CGRect(x: 0, y: 0, width: body, height: body)
             let tip = CGPoint(x: body / 2, y: body + pointer)

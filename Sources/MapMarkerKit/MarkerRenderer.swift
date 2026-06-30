@@ -50,8 +50,8 @@ public enum MarkerRenderer {
                       color: fill, number: number, in: ctx)
         case .balloon:
             let rect = CGRect(origin: origin, size: geo.size)
-            let path = BalloonShape().path(in: rect)
-            fillAndStroke(path, fill: fill, stroke: stroke, lineWidth: 1.5, in: ctx)
+            let path = BalloonShape(bodyWidth: geo.size.width).path(in: rect)
+            fillAndStroke(path, fill: fill, stroke: stroke, lineWidth: max(1, geo.size.width * 0.058), in: ctx)
             drawGlyph(style.symbol, at: shift(geo.glyphCenter, by: origin),
                       pointSize: geo.glyphPointSize, color: glyphColor, number: number, in: ctx)
         }

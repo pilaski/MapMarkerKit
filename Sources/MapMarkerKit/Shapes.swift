@@ -98,9 +98,21 @@ public struct BalloonShape: Shape {
     public var pointer: CGFloat
     public var cornerRadius: CGFloat
 
+    /// The downward pointer's height as a fraction of the body width.
+    public static let pointerRatio: CGFloat = 9.0 / 26.0
+    /// The body's corner radius as a fraction of the body width.
+    public static let cornerRatio: CGFloat = 11.0 / 26.0
+
     public init(pointer: CGFloat = 9, cornerRadius: CGFloat = 11) {
         self.pointer = pointer
         self.cornerRadius = cornerRadius
+    }
+
+    /// A balloon scaled from its body width, keeping the pointer and corner radius
+    /// in proportion so the outline looks identical at any size.
+    public init(bodyWidth: CGFloat) {
+        self.pointer = bodyWidth * BalloonShape.pointerRatio
+        self.cornerRadius = bodyWidth * BalloonShape.cornerRatio
     }
 
     public func path(in rect: CGRect) -> Path {

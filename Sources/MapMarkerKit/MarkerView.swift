@@ -132,10 +132,12 @@ public struct MarkerView: View {
     }
 
     private func balloonBody(_ geo: MarkerGeometry) -> some View {
-        ZStack {
-            BalloonShape()
+        let shape = BalloonShape(bodyWidth: geo.size.width)
+        let stroke = max(1, geo.size.width * 0.058)
+        return ZStack {
+            shape
                 .fill(fill)
-                .overlay(BalloonShape().stroke(style.strokeColor, lineWidth: 1.5))
+                .overlay(shape.stroke(style.strokeColor, lineWidth: stroke))
                 .shadow(radius: 1.5)
             glyph(pointSize: geo.glyphPointSize, color: style.glyphColor)
                 .position(geo.glyphCenter)

@@ -66,6 +66,21 @@ final class MapMarkerKitTests: XCTestCase {
         XCTAssertNotEqual(geo.box(for: .base), geo.box(for: .secondary))
     }
 
+    func testBalloonGeometryScalesWithSize() {
+        let small = MarkerGeometry.make(for: MarkerStyle(shape: .balloon, size: 26))
+        let large = MarkerGeometry.make(for: MarkerStyle(shape: .balloon, size: 52))
+        // The body width tracks the style size, and the pointer scales with it.
+        XCTAssertEqual(small.size.width, 26, accuracy: 0.001)
+        XCTAssertEqual(large.size.width, 52, accuracy: 0.001)
+        XCTAssertEqual(large.size.height, small.size.height * 2, accuracy: 0.001)
+        XCTAssertEqual(large.glyphCenter.x, small.glyphCenter.x * 2, accuracy: 0.001)
+    }
+
+    func testBalloonStyleHasSizeCapability() {
+        let balloon = MarkerCatalog.markerStyle(id: "balloon")!
+        XCTAssertTrue(balloon.capabilities.contains(.size))
+    }
+
     func testColorHexRoundTrip() {
         XCTAssertNotNil(Color(rgbaHex: "3478F6FF"))
         XCTAssertNil(Color(rgbaHex: "xyz"))

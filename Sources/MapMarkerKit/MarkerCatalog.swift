@@ -103,9 +103,9 @@ public enum MarkerCatalog {
                                       label: MarkerLabelStyle(placement: .right))),
         MarkerStyleTemplate(
             id: "balloon", name: "Balloon", shape: .balloon,
-            capabilities: [.fillColor, .glyphColor, .symbol, .label],
+            capabilities: [.fillColor, .glyphColor, .symbol, .size, .label],
             defaultStyle: MarkerStyle(shape: .balloon, symbol: .star, fillColor: .teal,
-                                      glyphColor: .white,
+                                      glyphColor: .white, size: 26,
                                       label: MarkerLabelStyle(placement: .right, anchor: .secondary)))
     ]
 
