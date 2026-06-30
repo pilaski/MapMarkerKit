@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pilaski/MapMarkerKit.git",
       "state" : {
-        "revision" : "0d0817f7ae4b22ce0af51d6fdd4636ea15708e0d",
-        "version" : "0.0.2"
+        "revision" : "097e85becadf7a791303938716dc22ecd0d2f7fb",
+        "version" : "0.0.4"
       }
     }
   ],
