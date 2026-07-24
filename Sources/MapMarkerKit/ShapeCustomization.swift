@@ -51,8 +51,9 @@ public struct ShapeCustomization: Equatable, Codable, Sendable {
 public extension MarkerShape {
 
     /// The adjustable dimension parameters this shape exposes, at their default values.
-    /// Circle and dot expose none (their only dimension is the marker size, handled by
-    /// `MarkerStyle.size`); the pin and balloon expose their outline proportions.
+    /// Circle, dot, square and diamond expose none (their only dimension is the marker
+    /// size, handled by `MarkerStyle.size`); the pin and balloon expose their outline
+    /// proportions.
     var customizableParameters: [ShapeParameter] {
         switch self {
         case .teardrop:
@@ -67,7 +68,7 @@ public extension MarkerShape {
                 ShapeParameter(id: "pointer", name: "Pointer length", range: 0.15...0.60, defaultValue: BalloonShape.pointerRatio),
                 ShapeParameter(id: "corner",  name: "Corner radius",  range: 0.0...0.50,  defaultValue: BalloonShape.cornerRatio)
             ]
-        case .circle, .dot:
+        case .circle, .dot, .square, .diamond:
             return []
         }
     }

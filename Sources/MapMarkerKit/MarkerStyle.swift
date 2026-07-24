@@ -85,6 +85,15 @@ public struct MarkerGeometry {
             return MarkerGeometry(size: box.size, basePoint: center, secondaryPoint: center,
                                   baseBox: box, secondaryBox: box,
                                   glyphCenter: center, glyphPointSize: 0)
+        case .square, .diamond:
+            let d = highlighted ? base * 1.25 : base
+            let box = CGRect(x: 0, y: 0, width: d, height: d)
+            let center = CGPoint(x: d / 2, y: d / 2)
+            // Matches the circle's glyph scale so the centred, bordered shapes read as
+            // a family (a route point looks the same when its shape is switched).
+            return MarkerGeometry(size: box.size, basePoint: center, secondaryPoint: center,
+                                  baseBox: box, secondaryBox: box,
+                                  glyphCenter: center, glyphPointSize: base * 0.55)
         case .teardrop:
             let w = highlighted ? base * 1.18 : base
             let h = w * style.shape.value(of: "aspect", in: style.customization)

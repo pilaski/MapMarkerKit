@@ -106,7 +106,19 @@ public enum MarkerCatalog {
             capabilities: [.fillColor, .glyphColor, .symbol, .size, .label],
             defaultStyle: MarkerStyle(shape: .balloon, symbol: .star, fillColor: .teal,
                                       glyphColor: .white, size: 26,
-                                      label: MarkerLabelStyle(placement: .right, anchor: .secondary)))
+                                      label: MarkerLabelStyle(placement: .right, anchor: .secondary))),
+        MarkerStyleTemplate(
+            id: "square", name: "Square", shape: .square,
+            capabilities: [.fillColor, .glyphColor, .strokeColor, .symbol, .size, .label],
+            defaultStyle: MarkerStyle(shape: .square, symbol: .number, fillColor: .green,
+                                      glyphColor: .white, strokeColor: .white, size: 22,
+                                      label: MarkerLabelStyle(placement: .right))),
+        MarkerStyleTemplate(
+            id: "diamond", name: "Diamond", shape: .diamond,
+            capabilities: [.fillColor, .glyphColor, .strokeColor, .symbol, .size, .label],
+            defaultStyle: MarkerStyle(shape: .diamond, symbol: .number, fillColor: .indigo,
+                                      glyphColor: .white, strokeColor: .white, size: 22,
+                                      label: MarkerLabelStyle(placement: .right)))
     ]
 
     /// Every predefined label style.

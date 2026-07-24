@@ -88,6 +88,35 @@ public struct TeardropPinShape: Shape {
     }
 }
 
+// MARK: - Diamond
+
+/// A diamond outline: a square rotated 45°, its four vertices touching the mid-points
+/// of the bounding rect's edges. Centred on the coordinate; used for a compact,
+/// distinct route/track marker. Conforms to `InsettableShape` so it can be drawn with
+/// `strokeBorder` for an inset border, like `Circle` and `RoundedRectangle`.
+public struct DiamondShape: InsettableShape {
+    private var inset: CGFloat
+
+    public init() { self.inset = 0 }
+
+    public func path(in rect: CGRect) -> Path {
+        let r = rect.insetBy(dx: inset, dy: inset)
+        var p = Path()
+        p.move(to: CGPoint(x: r.midX, y: r.minY))
+        p.addLine(to: CGPoint(x: r.maxX, y: r.midY))
+        p.addLine(to: CGPoint(x: r.midX, y: r.maxY))
+        p.addLine(to: CGPoint(x: r.minX, y: r.midY))
+        p.closeSubpath()
+        return p
+    }
+
+    public func inset(by amount: CGFloat) -> DiamondShape {
+        var copy = self
+        copy.inset += amount
+        return copy
+    }
+}
+
 // MARK: - Balloon
 
 /// A rounded-rectangle balloon body with a downward pointer at the bottom centre,

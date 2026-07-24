@@ -33,6 +33,20 @@ public enum MarkerRenderer {
         case .dot:
             drawCircle(in: geo.baseBox.offsetBy(dx: origin.x, dy: origin.y),
                        fill: fill, stroke: stroke, borderRatio: 0.16, in: ctx)
+        case .square:
+            let rect = geo.baseBox.offsetBy(dx: origin.x, dy: origin.y)
+            let path = Path(roundedRect: rect, cornerRadius: 3)
+            fillAndBorder(path, fill: fill, stroke: stroke,
+                          lineWidth: max(1, geo.size.width * 0.1), in: ctx)
+            drawGlyph(style.symbol, at: shift(geo.glyphCenter, by: origin),
+                      pointSize: geo.glyphPointSize, color: glyphColor, number: number, in: ctx)
+        case .diamond:
+            let rect = geo.baseBox.offsetBy(dx: origin.x, dy: origin.y)
+            let path = DiamondShape().path(in: rect)
+            fillAndBorder(path, fill: fill, stroke: stroke,
+                          lineWidth: max(1, geo.size.width * 0.1), in: ctx)
+            drawGlyph(style.symbol, at: shift(geo.glyphCenter, by: origin),
+                      pointSize: geo.glyphPointSize, color: glyphColor, number: number, in: ctx)
         case .teardrop:
             let rect = CGRect(origin: origin, size: geo.size)
             let path = TeardropPinShape(customization: style.customization).path(in: rect)
@@ -180,6 +194,21 @@ public enum MarkerRenderer {
         ctx.addPath(cg); ctx.fillPath()
         ctx.restoreGState()
         ctx.saveGState()
+        ctx.setStrokeColor(stroke.cgColor)
+        ctx.setLineWidth(lineWidth)
+        ctx.addPath(cg); ctx.strokePath()
+        ctx.restoreGState()
+    }
+
+    /// Fills `path` then strokes its outline centred on the edge (no drop shadow),
+    /// giving a bordered shape like the SwiftUI `strokeBorder` look. Used by the
+    /// centred square / diamond markers.
+    private static func fillAndBorder(_ path: Path, fill: UIColor, stroke: UIColor,
+                                      lineWidth: CGFloat, in ctx: CGContext) {
+        let cg = path.cgPath
+        ctx.saveGState()
+        ctx.setFillColor(fill.cgColor)
+        ctx.addPath(cg); ctx.fillPath()
         ctx.setStrokeColor(stroke.cgColor)
         ctx.setLineWidth(lineWidth)
         ctx.addPath(cg); ctx.strokePath()

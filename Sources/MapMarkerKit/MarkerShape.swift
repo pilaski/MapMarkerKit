@@ -13,6 +13,11 @@ public enum MarkerShape: String, CaseIterable, Identifiable, Codable, Sendable {
     case dot
     /// A rounded-rectangle balloon whose pointer tip sits on the coordinate.
     case balloon
+    /// A filled, bordered rounded square carrying a glyph, centred on the coordinate.
+    case square
+    /// A filled, bordered diamond (a square rotated 45°) carrying a glyph, centred on
+    /// the coordinate.
+    case diamond
 
     public var id: String { rawValue }
 
@@ -23,6 +28,8 @@ public enum MarkerShape: String, CaseIterable, Identifiable, Codable, Sendable {
         case .circle:   return "Circle"
         case .dot:      return "Dot"
         case .balloon:  return "Balloon"
+        case .square:   return "Square"
+        case .diamond:  return "Diamond"
         }
     }
 
@@ -33,6 +40,8 @@ public enum MarkerShape: String, CaseIterable, Identifiable, Codable, Sendable {
         case .circle:   return "mappin.circle.fill"
         case .dot:      return "smallcircle.filled.circle"
         case .balloon:  return "mappin.and.ellipse"
+        case .square:   return "square.fill"
+        case .diamond:  return "diamond.fill"
         }
     }
 

@@ -79,6 +79,8 @@ public struct MarkerView: View {
         case .circle:   circleBody(geo)
         case .dot:      dotBody(geo)
         case .balloon:  balloonBody(geo)
+        case .square:   squareBody(geo)
+        case .diamond:  diamondBody(geo)
         }
     }
 
@@ -118,6 +120,30 @@ public struct MarkerView: View {
         return Circle()
             .fill(fill)
             .overlay(Circle().strokeBorder(style.strokeColor, lineWidth: max(1, style.resolvedSize * 0.1)))
+            .overlay { glyph(pointSize: geo.glyphPointSize, color: style.glyphColor) }
+            .frame(width: d, height: d)
+            .shadow(color: .black.opacity(0.3), radius: 1, y: 0.5)
+    }
+
+    // A filled rounded square with a bordered outline and a centred glyph — the same
+    // family as `circleBody`, but square. Used for route/track markers.
+    private func squareBody(_ geo: MarkerGeometry) -> some View {
+        let d = geo.size.width
+        let shape = RoundedRectangle(cornerRadius: 3, style: .continuous)
+        return shape
+            .fill(fill)
+            .overlay(shape.strokeBorder(style.strokeColor, lineWidth: max(1, style.resolvedSize * 0.1)))
+            .overlay { glyph(pointSize: geo.glyphPointSize, color: style.glyphColor) }
+            .frame(width: d, height: d)
+            .shadow(color: .black.opacity(0.3), radius: 1, y: 0.5)
+    }
+
+    // A filled diamond (square rotated 45°) with a bordered outline and a centred glyph.
+    private func diamondBody(_ geo: MarkerGeometry) -> some View {
+        let d = geo.size.width
+        return DiamondShape()
+            .fill(fill)
+            .overlay(DiamondShape().strokeBorder(style.strokeColor, lineWidth: max(1, style.resolvedSize * 0.1)))
             .overlay { glyph(pointSize: geo.glyphPointSize, color: style.glyphColor) }
             .frame(width: d, height: d)
             .shadow(color: .black.opacity(0.3), radius: 1, y: 0.5)
