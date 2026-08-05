@@ -5,20 +5,28 @@ extension Color {
     /// colours (e.g. `.primary`) are resolved to a concrete value so they persist as
     /// real components.
     public var rgbaHex: String {
-        #if canImport(UIKit)
-        let uiColor = UIColor(self).resolvedColor(with: .current)
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 1
-        if !uiColor.getRed(&r, green: &g, blue: &b, alpha: &a) {
+
+        #if canImport(UIKit)
+        let resolved = UIColor(self).resolvedColor(with: .current)
+        if !resolved.getRed(&r, green: &g, blue: &b, alpha: &a) {
             var w: CGFloat = 1
-            if uiColor.getWhite(&w, alpha: &a) { r = w; g = w; b = w }
+            if resolved.getWhite(&w, alpha: &a) { r = w; g = w; b = w }
         }
+        #elseif canImport(AppKit)
+        // `getRed(…)` traps rather than returning false on AppKit if the colour
+        // isn't already in an RGB space, so convert first and only read the
+        // components once the conversion has actually succeeded. Catalog and
+        // pattern colours are the ones that fail to convert.
+        if let resolved = NSColor(self).usingColorSpace(.sRGB) {
+            resolved.getRed(&r, green: &g, blue: &b, alpha: &a)
+        }
+        #endif
+
         func component(_ value: CGFloat) -> String {
             String(format: "%02X", Int((max(0, min(1, value)) * 255).rounded()))
         }
         return component(r) + component(g) + component(b) + component(a)
-        #else
-        return "0000FFFF"
-        #endif
     }
 
     /// Reconstructs a colour from an 8-digit RGBA hex string.

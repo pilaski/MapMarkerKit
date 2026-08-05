@@ -4,7 +4,11 @@ import PackageDescription
 let package = Package(
     name: "MapMarkerKit",
     platforms: [
-        .iOS(.v17)
+        .iOS(.v17),
+        // Markers render through Core Graphics with a thin UIKit/AppKit shim
+        // (Platform.swift), so the kit builds for Mac as well. v14 is what the
+        // SF Symbol configuration APIs used here need.
+        .macOS(.v14)
     ],
     products: [
         .library(

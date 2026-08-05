@@ -1,6 +1,4 @@
-#if canImport(UIKit)
 import SwiftUI
-import UIKit
 import CoreGraphics
 
 /// Core Graphics rendering of markers and labels that mirrors the SwiftUI `MarkerView`,
@@ -17,12 +15,29 @@ public enum MarkerRenderer {
                                   number: Int? = nil,
                                   highlighted: Bool = false,
                                   in ctx: CGContext) {
+        // Labels and SF Symbol glyphs render through AppKit/UIKit calls that take
+        // no context argument, so `ctx` has to be the *ambient* one for the length
+        // of the draw. On iOS a `UIGraphicsImageRenderer` caller already arranged
+        // that; on macOS nothing does, and text would silently not appear.
+        PlatformGraphics.withContext(ctx) {
+            draw(at: point, style: style, primary: primary, secondary: secondary,
+                 number: number, highlighted: highlighted, in: ctx)
+        }
+    }
+
+    private static func draw(at point: CGPoint,
+                             style: MarkerStyle,
+                             primary: String?,
+                             secondary: String?,
+                             number: Int?,
+                             highlighted: Bool,
+                             in ctx: CGContext) {
         let geo = MarkerGeometry.make(for: style, highlighted: highlighted)
         // Translate so the geometry's base point lands on `point`.
         let origin = CGPoint(x: point.x - geo.basePoint.x, y: point.y - geo.basePoint.y)
-        let fill = highlighted ? UIColor.red : UIColor(style.fillColor)
-        let stroke = UIColor(style.strokeColor)
-        let glyphColor = UIColor(style.glyphColor)
+        let fill = highlighted ? PlatformColor.red : PlatformColor(style.fillColor)
+        let stroke = PlatformColor(style.strokeColor)
+        let glyphColor = PlatformColor(style.glyphColor)
 
         switch style.shape {
         case .circle:
@@ -88,8 +103,8 @@ public enum MarkerRenderer {
         [primary, style.twoSegment ? secondary : nil].compactMap { $0 }.filter { !$0.isEmpty }
     }
 
-    private static func labelFont(_ style: MarkerLabelStyle) -> UIFont {
-        UIFont.systemFont(ofSize: max(8, style.fontSize), weight: .semibold)
+    private static func labelFont(_ style: MarkerLabelStyle) -> PlatformFont {
+        PlatformFont.systemFont(ofSize: max(8, style.fontSize), weight: .semibold)
     }
 
     private static func drawLabel(_ style: MarkerLabelStyle, parts: [String],
@@ -112,10 +127,10 @@ public enum MarkerRenderer {
         let origin = labelOrigin(placement: style.placement, distance: style.distance,
                                  refBox: refBox, labelSize: size)
 
-        let textColor = UIColor(style.textColor)
+        let textColor = PlatformColor(style.textColor)
         let backgrounds = style.twoSegment && parts.count == 2
-            ? [UIColor(style.backgroundColor), UIColor(style.secondaryColor)]
-            : [UIColor(style.backgroundColor)]
+            ? [PlatformColor(style.backgroundColor), PlatformColor(style.secondaryColor)]
+            : [PlatformColor(style.backgroundColor)]
 
         var x = origin.x
         for (i, part) in parts.enumerated() {
@@ -126,7 +141,8 @@ public enum MarkerRenderer {
                 let radius: CGFloat = style.shape == .pill ? box.height / 2 : 3
                 ctx.saveGState()
                 ctx.setFillColor(bg.cgColor)
-                ctx.addPath(UIBezierPath(roundedRect: box, cornerRadius: radius).cgPath)
+                ctx.addPath(CGPath(roundedRect: box, cornerWidth: radius, cornerHeight: radius,
+                                   transform: nil))
                 ctx.fillPath()
                 ctx.restoreGState()
             }
@@ -136,8 +152,8 @@ public enum MarkerRenderer {
         }
     }
 
-    private static func drawText(_ text: String, at point: CGPoint, font: UIFont,
-                                 style: MarkerLabelStyle, textColor: UIColor, in ctx: CGContext) {
+    private static func drawText(_ text: String, at point: CGPoint, font: PlatformFont,
+                                 style: MarkerLabelStyle, textColor: PlatformColor, in ctx: CGContext) {
         let ns = text as NSString
         switch style.textStyle {
         case .plain:
@@ -149,7 +165,7 @@ public enum MarkerRenderer {
             let attrs: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: textColor,
-                .strokeColor: UIColor(style.outlineColor),
+                .strokeColor: PlatformColor(style.outlineColor),
                 .strokeWidth: -width / font.pointSize * 100
             ]
             ns.draw(at: point, withAttributes: attrs)
@@ -174,7 +190,7 @@ public enum MarkerRenderer {
         CGPoint(x: p.x + o.x, y: p.y + o.y)
     }
 
-    private static func drawCircle(in rect: CGRect, fill: UIColor, stroke: UIColor,
+    private static func drawCircle(in rect: CGRect, fill: PlatformColor, stroke: PlatformColor,
                                    borderRatio: CGFloat, in ctx: CGContext) {
         let border = max(1, rect.width / 2 * borderRatio)
         ctx.saveGState()
@@ -185,11 +201,11 @@ public enum MarkerRenderer {
         ctx.restoreGState()
     }
 
-    private static func fillAndStroke(_ path: Path, fill: UIColor, stroke: UIColor,
+    private static func fillAndStroke(_ path: Path, fill: PlatformColor, stroke: PlatformColor,
                                       lineWidth: CGFloat, in ctx: CGContext) {
         let cg = path.cgPath
         ctx.saveGState()
-        ctx.setShadow(offset: CGSize(width: 0, height: 1), blur: 2, color: UIColor.black.withAlphaComponent(0.25).cgColor)
+        ctx.setShadow(offset: CGSize(width: 0, height: 1), blur: 2, color: PlatformColor.black.withAlphaComponent(0.25).cgColor)
         ctx.setFillColor(fill.cgColor)
         ctx.addPath(cg); ctx.fillPath()
         ctx.restoreGState()
@@ -203,7 +219,7 @@ public enum MarkerRenderer {
     /// Fills `path` then strokes its outline centred on the edge (no drop shadow),
     /// giving a bordered shape like the SwiftUI `strokeBorder` look. Used by the
     /// centred square / diamond markers.
-    private static func fillAndBorder(_ path: Path, fill: UIColor, stroke: UIColor,
+    private static func fillAndBorder(_ path: Path, fill: PlatformColor, stroke: PlatformColor,
                                       lineWidth: CGFloat, in ctx: CGContext) {
         let cg = path.cgPath
         ctx.saveGState()
@@ -216,9 +232,9 @@ public enum MarkerRenderer {
     }
 
     private static func drawGlyph(_ symbol: MarkerSymbol, at point: CGPoint,
-                                  pointSize: CGFloat, color: UIColor, number: Int?, in ctx: CGContext) {
+                                  pointSize: CGFloat, color: PlatformColor, number: Int?, in ctx: CGContext) {
         if symbol.isNumber, let number {
-            let font = UIFont.systemFont(ofSize: pointSize * 1.05, weight: .bold)
+            let font = PlatformFont.systemFont(ofSize: pointSize * 1.05, weight: .bold)
             let ns = "\(number)" as NSString
             let s = ns.size(withAttributes: [.font: font])
             ns.draw(at: CGPoint(x: point.x - s.width / 2, y: point.y - s.height / 2),
@@ -231,10 +247,7 @@ public enum MarkerRenderer {
                               width: image.size.width, height: image.size.height))
     }
 
-    private static func symbolImage(_ name: String, pointSize: CGFloat, color: UIColor) -> UIImage? {
-        let config = UIImage.SymbolConfiguration(pointSize: pointSize, weight: .semibold)
-        return UIImage(systemName: name, withConfiguration: config)?
-            .withTintColor(color, renderingMode: .alwaysOriginal)
+    private static func symbolImage(_ name: String, pointSize: CGFloat, color: PlatformColor) -> PlatformImage? {
+        PlatformGraphics.symbolImage(name, pointSize: pointSize, color: color)
     }
 }
-#endif
