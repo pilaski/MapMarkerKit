@@ -128,10 +128,35 @@ Swift Playgrounds (iPad/Mac) or Xcode — it depends on this package remotely fr
   label attaches to its tip (base) and a balloon whose label attaches to its body
   (secondary anchor).
 
+## Portable rendering (`PlatformRenderer`)
+
+`UIGraphicsImageRenderer` and `UIGraphicsPDFRenderer` are iOS-only, so the kit ships
+replacements that the dependent packages render through:
+
+```swift
+PlatformRenderer.image(size:scale:opaque:_:) -> CGImage?
+PlatformRenderer.pdf(bounds:_:) -> Data          // block gets a PDFPageWriter
+```
+
+They deal in `CGContext` and `CGImage` rather than `UIImage`/`NSImage` deliberately —
+both are portable types needing no alias, so this can be public API without exporting a
+`PlatformImage` name that would collide with another module's.
+
+The block always receives a **top-left-origin** context (UIKit's convention, which the
+drawing code assumes) with the platform's **ambient graphics context** installed. That
+second part is not optional: `NSString.draw(at:)` and image drawing take no context
+argument, and AppKit's `NSGraphicsContext` stack is empty when you hand Core Graphics a
+bare `CGContext` — text simply doesn't appear without it.
+
 ## Platforms
 
-iOS 17+. The SwiftUI views are cross-platform; `MarkerRenderer` and color resolution
-use UIKit and are gated to UIKit platforms.
+iOS 17+ and macOS 14+. `MarkerRenderer` and colour resolution go through the UIKit /
+AppKit shim in `Platform.swift`; the SwiftUI views were already cross-platform.
+
+Two macOS differences are handled there rather than at call sites: AppKit has no
+`withTintColor(_:renderingMode:)`, so a tinted SF Symbol is drawn through a `.sourceIn`
+blend; and `NSColor.getRed(…)` *traps* on a non-RGB colour instead of returning `false`,
+so `Color.rgbaHex` converts to sRGB first.
 
 ## License
 

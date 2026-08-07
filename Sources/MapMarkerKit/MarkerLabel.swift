@@ -107,3 +107,32 @@ public struct MarkerLabel: View {
         }
     }
 }
+
+// MARK: - Previews
+
+#Preview("Outlined text") {
+    OutlinedText("Brandenburg Gate", font: .caption.bold(),
+                 fill: .white, outline: .black, width: 1.5)
+        .padding()
+        .background(.blue)
+}
+
+#Preview("Marker labels") {
+    VStack(alignment: .leading, spacing: 12) {
+        MarkerLabel(style: MarkerLabelStyle(placement: .right, anchor: .base, distance: 5,
+                                            fontSize: 11, textColor: .primary,
+                                            textStyle: .plain, shape: .pill,
+                                            backgroundColor: .white.opacity(0.9),
+                                            twoSegment: false,
+                                            secondaryColor: .orange.opacity(0.9)),
+                    primary: "FRA")
+        MarkerLabel(style: MarkerLabelStyle(placement: .right, anchor: .base, distance: 5,
+                                            fontSize: 11, textColor: .primary,
+                                            textStyle: .outlined, shape: .pill,
+                                            backgroundColor: .white.opacity(0.9),
+                                            twoSegment: true,
+                                            secondaryColor: .orange.opacity(0.9)),
+                    primary: "FRA", secondary: "Frankfurt")
+    }
+    .padding()
+}
