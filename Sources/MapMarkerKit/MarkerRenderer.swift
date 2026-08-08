@@ -251,3 +251,70 @@ public enum MarkerRenderer {
         PlatformGraphics.symbolImage(name, pointSize: pointSize, color: color)
     }
 }
+
+// MARK: - Standalone marker primitives
+
+/// Two markers that aren't built from a `MarkerStyle` but are markers all the
+/// same, and so belong here rather than in whichever package happened to need
+/// them first.
+///
+/// Both were previously drawn inline elsewhere — the route dot in
+/// TravelMapKit's thumbnail service, the numbered bullet in TravelBookKit's
+/// export renderer. Keeping every glyph the app draws in one file is the point
+/// of this package: it is what lets a static export match the live map, and
+/// it's how a change to marker drawing reaches every surface at once.
+public extension MarkerRenderer {
+
+    /// A filled dot with a contrasting ring — the endpoints of a route on a
+    /// thumbnail, and the individual points of a short track.
+    ///
+    /// Not `MarkerStyle.dot`: that sizes its ring as a *fraction* of the dot, so
+    /// a 3pt thumbnail dot would get a hairline ring and vanish against a busy
+    /// map. Here the ring is an absolute width, which is what keeps a small dot
+    /// legible.
+    static func drawDot(at point: CGPoint,
+                        radius: CGFloat,
+                        fill: Color,
+                        ring: Color = .white,
+                        ringWidth: CGFloat = 1.5,
+                        in ctx: CGContext) {
+        let outer = radius + ringWidth
+        ctx.saveGState()
+        ctx.setFillColor(PlatformColor(ring).cgColor)
+        ctx.fillEllipse(in: CGRect(x: point.x - outer, y: point.y - outer,
+                                   width: outer * 2, height: outer * 2))
+        ctx.setFillColor(PlatformColor(fill).cgColor)
+        ctx.fillEllipse(in: CGRect(x: point.x - radius, y: point.y - radius,
+                                   width: radius * 2, height: radius * 2))
+        ctx.restoreGState()
+    }
+
+    /// A numbered disc sized to `rect` — the badge an exported waypoints table
+    /// puts before each name, matching the numbers on the map beside it.
+    ///
+    /// The font is derived from the rect rather than fixed, so the badge stays
+    /// legible if a recipe ever asks for a bigger one.
+    static func drawNumberedBullet(_ number: Int,
+                                   in rect: CGRect,
+                                   fill: Color,
+                                   textColor: Color = .white,
+                                   in ctx: CGContext) {
+        PlatformGraphics.withContext(ctx) {
+            ctx.saveGState()
+            ctx.setFillColor(PlatformColor(fill).cgColor)
+            ctx.fillEllipse(in: rect)
+            ctx.restoreGState()
+
+            let font = PlatformFont.boldSystemFont(ofSize: max(6, rect.height * 0.56))
+            let text = "\(number)" as NSString
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: PlatformColor(textColor)
+            ]
+            let size = text.size(withAttributes: attributes)
+            text.draw(at: CGPoint(x: rect.midX - size.width / 2,
+                                  y: rect.midY - size.height / 2),
+                      withAttributes: attributes)
+        }
+    }
+}
