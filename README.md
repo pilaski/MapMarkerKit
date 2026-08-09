@@ -32,6 +32,13 @@ Extracted from and used by the TravelMap app.
   each with the capabilities it exposes (`MarkerCapabilities`) and a SwiftUI `preview`.
 - **Matching Core Graphics renderer** (`MarkerRenderer`) so static images match the
   live map.
+- **Standalone primitives** for the markers that aren't built from a `MarkerStyle`:
+  `MarkerRenderer.drawDot` (a filled dot with an absolute-width ring, for route
+  endpoints on a thumbnail) and `MarkerRenderer.drawNumberedBullet` (the numbered
+  disc an exported waypoint table puts before each name).
+- **`TrackTypeBadge`** — the glyph-in-a-disc badge that sits on a track saying what
+  kind of track it is. SwiftUI only, deliberately: it is a tap target that never
+  appears in a snapshot or an export, so a Core Graphics twin would be unreachable.
 
 ## Installation
 
