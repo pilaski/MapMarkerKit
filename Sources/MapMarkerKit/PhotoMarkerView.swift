@@ -4,10 +4,12 @@ import SwiftUI
 ///
 /// Two variants, matching the two shapes it makes sense on: a **circle** whose
 /// whole face is the picture, and a **pin** carrying the picture in the head
-/// disc where the glyph would otherwise sit. Both keep a small badge showing
-/// the waypoint's own symbol, because a round photograph on a map is a
-/// wonderful thing to look at and a hopeless thing to identify — the badge is
-/// what still says "this is a hotel" at a glance.
+/// disc where the glyph would otherwise sit. Both carry a small badge showing
+/// the waypoint's own symbol (or its number), because a round photograph on a
+/// map is a wonderful thing to look at and a hopeless thing to identify — the
+/// badge is what still says "this is a hotel" at a glance. It can be switched
+/// off with `showsBadge`, since it is also the one thing covering part of the
+/// picture.
 ///
 /// **Not a `MarkerShape` case.** A shape is drawn by three things — this view,
 /// `MarkerRenderer`'s Core Graphics path, and the geometry table — and a
@@ -62,6 +64,13 @@ public struct PhotoMarkerView: View {
     var primaryText: String?
     var secondaryText: String?
     var number: Int?
+    /// Whether to draw the badge at all.
+    ///
+    /// Defaults to on, because a round photograph is hard to identify without
+    /// it — but the badge is also the only thing covering part of the picture,
+    /// and someone who chose a photo marker precisely to see the photograph
+    /// should be able to have all of it.
+    var showsBadge: Bool
     var highlighted: Bool
 
     public init(shape: Shape,
@@ -71,6 +80,7 @@ public struct PhotoMarkerView: View {
                 primaryText: String? = nil,
                 secondaryText: String? = nil,
                 number: Int? = nil,
+                showsBadge: Bool = true,
                 highlighted: Bool = false) {
         self.shape = shape
         self.photo = photo
@@ -79,6 +89,7 @@ public struct PhotoMarkerView: View {
         self.primaryText = primaryText
         self.secondaryText = secondaryText
         self.number = number
+        self.showsBadge = showsBadge
         self.highlighted = highlighted
     }
 
@@ -177,7 +188,7 @@ public struct PhotoMarkerView: View {
     /// identifiable as a hotel or a viewpoint.
     @ViewBuilder
     private func badge(diameter: CGFloat) -> some View {
-        if symbol.systemImage != nil || (symbol.isNumber && number != nil) {
+        if showsBadge, symbol.systemImage != nil || (symbol.isNumber && number != nil) {
             Circle()
                 .fill(fill)
                 .overlay(Circle().strokeBorder(style.strokeColor, lineWidth: max(0.75, diameter * 0.08)))
