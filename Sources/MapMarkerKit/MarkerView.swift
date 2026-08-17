@@ -78,6 +78,7 @@ public struct MarkerView: View {
         case .teardrop: teardropBody(geo)
         case .circle:   circleBody(geo)
         case .dot:      dotBody(geo)
+        case .ringedDot, .ring, .crosshair: pointMarkBody(geo)
         case .balloon:  balloonBody(geo)
         case .square:   squareBody(geo)
         case .diamond:  diamondBody(geo)
@@ -156,6 +157,34 @@ public struct MarkerView: View {
             .overlay(Circle().strokeBorder(style.strokeColor, lineWidth: 1.5))
             .frame(width: d, height: d)
             .shadow(radius: 1)
+    }
+
+    /// The three point marks, drawn to the same proportions the Core Graphics
+    /// renderer uses so a marker on screen and the same marker in an export or
+    /// an outline map are the same picture.
+    @ViewBuilder
+    private func pointMarkBody(_ geo: MarkerGeometry) -> some View {
+        let d = geo.size.width
+        switch style.shape {
+        case .ring:
+            Circle()
+                .strokeBorder(fill, lineWidth: d * 0.2)
+                .frame(width: d, height: d)
+        case .ringedDot:
+            Circle()
+                .strokeBorder(style.strokeColor, lineWidth: d * 0.18)
+                .overlay { Circle().fill(fill).frame(width: d * 0.52, height: d * 0.52) }
+                .frame(width: d, height: d)
+        case .crosshair:
+            ZStack {
+                Rectangle().fill(fill).frame(width: d, height: d * 0.12)
+                Rectangle().fill(fill).frame(width: d * 0.12, height: d)
+                Circle().fill(fill).frame(width: d * 0.32, height: d * 0.32)
+            }
+            .frame(width: d, height: d)
+        default:
+            EmptyView()
+        }
     }
 
     private func balloonBody(_ geo: MarkerGeometry) -> some View {

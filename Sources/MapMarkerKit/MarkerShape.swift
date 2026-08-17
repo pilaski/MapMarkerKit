@@ -18,6 +18,15 @@ public enum MarkerShape: String, CaseIterable, Identifiable, Codable, Sendable {
     /// A filled, bordered diamond (a square rotated 45°) carrying a glyph, centred on
     /// the coordinate.
     case diamond
+    /// A filled disc inside a thick ring of the same colour, centred on the
+    /// coordinate. Reads at postage-stamp size where a plain dot disappears,
+    /// which is why it is the outline map's default.
+    case ringedDot
+    /// A ring with the map showing through it, centred on the coordinate.
+    case ring
+    /// A cross-hair with a small centre dot, centred on the coordinate — the
+    /// technical look, and the one that hides least of what is under it.
+    case crosshair
 
     public var id: String { rawValue }
 
@@ -30,6 +39,9 @@ public enum MarkerShape: String, CaseIterable, Identifiable, Codable, Sendable {
         case .balloon:  return "Balloon"
         case .square:   return "Square"
         case .diamond:  return "Diamond"
+        case .ringedDot: return "Ringed dot"
+        case .ring:     return "Ring"
+        case .crosshair: return "Cross-hair"
         }
     }
 
@@ -42,11 +54,27 @@ public enum MarkerShape: String, CaseIterable, Identifiable, Codable, Sendable {
         case .balloon:  return "mappin.and.ellipse"
         case .square:   return "square.fill"
         case .diamond:  return "diamond.fill"
+        case .ringedDot: return "smallcircle.filled.circle.fill"
+        case .ring:     return "circle"
+        case .crosshair: return "plus.viewfinder"
         }
     }
 
     /// Whether the shape carries an inner glyph (symbol or number).
-    public var showsGlyph: Bool { self != .dot }
+    ///
+    /// The three point shapes don't: their whole design is a mark small enough
+    /// to sit on a coordinate without covering it, and a glyph inside one would
+    /// be illegible at the size they are drawn.
+    public var showsGlyph: Bool {
+        switch self {
+        case .dot, .ringedDot, .ring, .crosshair: return false
+        default: return true
+        }
+    }
+
+    /// Shapes that mark a point rather than carry content — the set an outline
+    /// map offers, and the set that stays legible at a few millimetres.
+    public static let pointMarkers: [MarkerShape] = [.ringedDot, .dot, .ring, .crosshair, .teardrop]
 
     /// Whether the shape's natural anchor is its bottom tip (so the map annotation
     /// should be `.bottom`-anchored) rather than its centre.

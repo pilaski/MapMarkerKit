@@ -48,6 +48,9 @@ public enum MarkerRenderer {
         case .dot:
             drawCircle(in: geo.baseBox.offsetBy(dx: origin.x, dy: origin.y),
                        fill: fill, stroke: stroke, borderRatio: 0.16, in: ctx)
+        case .ringedDot, .ring, .crosshair:
+            drawPointMark(style.shape, in: geo.baseBox.offsetBy(dx: origin.x, dy: origin.y),
+                          fill: fill, stroke: stroke, in: ctx)
         case .square:
             let rect = geo.baseBox.offsetBy(dx: origin.x, dy: origin.y)
             let path = Path(roundedRect: rect, cornerRadius: 3)
@@ -188,6 +191,53 @@ public enum MarkerRenderer {
 
     private static func shift(_ p: CGPoint, by o: CGPoint) -> CGPoint {
         CGPoint(x: p.x + o.x, y: p.y + o.y)
+    }
+
+    /// The three point marks — a ringed dot, a ring, a cross-hair.
+    ///
+    /// One function for all three because they are the same idea at different
+    /// weights: a small mark centred on the coordinate that says "here" without
+    /// covering what is under it. The proportions are the ones the outline map
+    /// was tuned with, and they are what makes these legible at a few
+    /// millimetres where a glyph-bearing shape is a blob.
+    private static func drawPointMark(_ shape: MarkerShape, in rect: CGRect,
+                                      fill: PlatformColor, stroke: PlatformColor,
+                                      in ctx: CGContext) {
+        let size = rect.width
+        let centre = CGPoint(x: rect.midX, y: rect.midY)
+        ctx.saveGState()
+        defer { ctx.restoreGState() }
+
+        switch shape {
+        case .ring:
+            let width = size * 0.2
+            ctx.setStrokeColor(fill.cgColor)
+            ctx.setLineWidth(width)
+            ctx.strokeEllipse(in: rect.insetBy(dx: width / 2, dy: width / 2))
+        case .ringedDot:
+            let width = size * 0.18
+            ctx.setStrokeColor(stroke.cgColor)
+            ctx.setLineWidth(width)
+            ctx.strokeEllipse(in: rect.insetBy(dx: width / 2, dy: width / 2))
+            ctx.setFillColor(fill.cgColor)
+            ctx.fillEllipse(in: centred(on: centre, side: size * 0.52))
+        case .crosshair:
+            ctx.setStrokeColor(fill.cgColor)
+            ctx.setLineWidth(size * 0.12)
+            ctx.move(to: CGPoint(x: rect.minX, y: centre.y))
+            ctx.addLine(to: CGPoint(x: rect.maxX, y: centre.y))
+            ctx.move(to: CGPoint(x: centre.x, y: rect.minY))
+            ctx.addLine(to: CGPoint(x: centre.x, y: rect.maxY))
+            ctx.strokePath()
+            ctx.setFillColor(fill.cgColor)
+            ctx.fillEllipse(in: centred(on: centre, side: size * 0.32))
+        default:
+            break
+        }
+    }
+
+    private static func centred(on point: CGPoint, side: CGFloat) -> CGRect {
+        CGRect(x: point.x - side / 2, y: point.y - side / 2, width: side, height: side)
     }
 
     private static func drawCircle(in rect: CGRect, fill: PlatformColor, stroke: PlatformColor,

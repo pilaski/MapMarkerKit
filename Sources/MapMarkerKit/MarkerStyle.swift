@@ -78,7 +78,11 @@ public struct MarkerGeometry {
             return MarkerGeometry(size: box.size, basePoint: center, secondaryPoint: center,
                                   baseBox: box, secondaryBox: box,
                                   glyphCenter: center, glyphPointSize: base * 0.55)
-        case .dot:
+        case .dot, .ringedDot, .ring, .crosshair:
+            // The point shapes share the dot's geometry exactly: a square box
+            // centred on the coordinate, no glyph. What differs between them is
+            // only what is drawn inside that box, which is the renderers'
+            // business, not the layout's.
             let d = highlighted ? base * 1.35 : base
             let box = CGRect(x: 0, y: 0, width: d, height: d)
             let center = CGPoint(x: d / 2, y: d / 2)

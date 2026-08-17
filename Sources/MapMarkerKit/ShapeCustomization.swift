@@ -68,7 +68,9 @@ public extension MarkerShape {
                 ShapeParameter(id: "pointer", name: "Pointer length", range: 0.15...0.60, defaultValue: BalloonShape.pointerRatio),
                 ShapeParameter(id: "corner",  name: "Corner radius",  range: 0.0...0.50,  defaultValue: BalloonShape.cornerRatio)
             ]
-        case .circle, .dot, .square, .diamond:
+        case .circle, .dot, .square, .diamond, .ringedDot, .ring, .crosshair:
+            // Their only dimension is the marker size; the proportions inside
+            // a point mark are what make it read as that mark.
             return []
         }
     }
