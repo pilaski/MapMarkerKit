@@ -34,7 +34,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/pilaski/MapMarkerKit.git", "0.0.2"..<"1.0.0")
+        .package(url: "https://github.com/pilaski/MapMarkerKit.git", "0.0.11"..<"1.0.0")
     ],
     targets: [
         .executableTarget(
