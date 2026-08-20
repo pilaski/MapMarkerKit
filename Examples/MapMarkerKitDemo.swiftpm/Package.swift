@@ -34,6 +34,15 @@ let package = Package(
         )
     ],
     dependencies: [
+        // The floor is the version this demo actually needs, not the oldest
+        // that once worked. It sat at 0.0.2 while the demo grew, so when the
+        // marker views gained `showsBadge` the range quietly resolved 0.0.10
+        // and the demo failed to build with "Extra argument 'showsBadge' in
+        // call" — an error about the package, reported against the demo.
+        //
+        // Raise this whenever the demo starts using something new. The pin is
+        // a URL rather than a relative path because this example is copied to
+        // an iPad on its own, with no repository around it.
         .package(url: "https://github.com/pilaski/MapMarkerKit.git", "0.0.11"..<"1.0.0")
     ],
     targets: [
